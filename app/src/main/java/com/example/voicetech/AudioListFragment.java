@@ -1,5 +1,7 @@
 package com.example.voicetech;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
@@ -10,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -89,7 +92,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 }
             }
         });
-
+        System.out.println(allFiles.length);
 
         audioListAdapter = new AudioListAdapter(allFiles, this);
 
@@ -137,17 +140,17 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             public void onClick(View v) {
                 if (positionFile == 0) {
                     fileToPlay = allFiles[positionFile];
-                    if(isPlaying){
+                    if (isPlaying) {
                         stopAudio();
                         playAudio(fileToPlay);
                     } else {
                         playAudio(fileToPlay);
                     }
-                }else{
+                } else {
                     positionFile--;
                     System.out.println(positionFile);
                     fileToPlay = allFiles[positionFile];
-                    if(isPlaying){
+                    if (isPlaying) {
                         stopAudio();
                         playAudio(fileToPlay);
                     } else {
@@ -161,7 +164,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             public void onClick(View v) {
                 if (positionFile == 0) {
                     fileToPlay = allFiles[positionFile];
-                    if(isPlaying){
+                    if (isPlaying) {
                         stopAudio();
                         playAudio(fileToPlay);
                     } else {
@@ -169,21 +172,20 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                     }
                     positionFile++;
 
-                }
-                else{
-                    if (positionFile == (allFiles.length-1)) {
-                        positionFile=0;
+                } else {
+                    if (positionFile == (allFiles.length - 1)) {
+                        positionFile = 0;
                         fileToPlay = allFiles[positionFile];
-                        if(isPlaying){
+                        if (isPlaying) {
                             stopAudio();
                             playAudio(fileToPlay);
                         } else {
                             playAudio(fileToPlay);
                         }
-                    }else{
+                    } else {
                         System.out.println(positionFile);
                         fileToPlay = allFiles[positionFile];
-                        if(isPlaying){
+                        if (isPlaying) {
                             stopAudio();
                             playAudio(fileToPlay);
                         } else {
@@ -236,8 +238,67 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     }
 
     @Override
-    public void onItemLongClick(File file, int position) {
+    public void onItemLongClick(View view, File file, int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
+        builder.setTitle("Confirm");
+        builder.setMessage("Are you sure delete file: " + file.getName() + " ? ");
+
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+
+                System.out.println(position);
+                        audioListAdapter.notifyItemRemoved(position);
+                        audioListAdapter.notifyItemRangeChanged(position, allFiles.length);
+                        allFiles = changeArray(position);
+                        audioListAdapter = new AudioListAdapter(allFiles, AudioListFragment.this);
+
+                        audioList.setHasFixedSize(true);
+                        audioList.setLayoutManager(new LinearLayoutManager(getContext()));
+                        audioList.setAdapter(audioListAdapter);
+
+
+                        String path = Environment.getExternalStorageDirectory().getPath();
+
+                        File directory = new File(path);
+                        File filedelete = new File(directory, file.getName());
+                        Toast.makeText(getContext(), "Bạn đã xoá thành công file" + file.getName(), Toast.LENGTH_SHORT).show();
+                        boolean deleted = filedelete.delete();
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Do nothing
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+
+
+
+
+    }
+
+    private File[] changeArray(int positionDelete) {
+        File[] newFiles = new File[allFiles.length - 1];
+        for (int i = 0, k = 0; i < allFiles.length; i++) {
+
+            if (i == positionDelete) {
+                continue;
+            }
+
+            // else copy the element
+            newFiles[k++] = allFiles[i];
+        }
+        return newFiles;
     }
 
     private void pauseAudio() {

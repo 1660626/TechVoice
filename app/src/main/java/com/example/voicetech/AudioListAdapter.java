@@ -68,7 +68,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
 
         @Override
         public boolean onLongClick(View view) {
-            onItemListClick.onItemLongClick(allFiles[getAdapterPosition()], getAdapterPosition());
+            onItemListClick.onItemLongClick(view,allFiles[getAdapterPosition()], getAdapterPosition());
             return true;
         }
 
@@ -76,7 +76,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
 
     public interface onItemListClick {
         void onClickListener(File file, int position);
-        void onItemLongClick(File file,int position);
+        void onItemLongClick(View view,File file,int position);
     }
 
 }
