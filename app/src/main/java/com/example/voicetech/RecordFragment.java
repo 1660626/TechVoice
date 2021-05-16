@@ -83,6 +83,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        checkPermissions();
 
         bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLE_RATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
@@ -138,7 +139,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
                 record_pause_btn.setVisibility(View.VISIBLE);
                 record_list_btn.setVisibility(View.INVISIBLE);
                 record_btn.setVisibility(View.INVISIBLE);
-                checkPermissions();
                 startRecording(false);
 
                 break;
