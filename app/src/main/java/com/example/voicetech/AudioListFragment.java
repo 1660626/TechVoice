@@ -92,13 +92,13 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 }
             }
         });
-        System.out.println(allFiles.length);
+        if( allFiles != null ) {
+            audioListAdapter = new AudioListAdapter(allFiles, this);
 
-        audioListAdapter = new AudioListAdapter(allFiles, this);
-
-        audioList.setHasFixedSize(true);
-        audioList.setLayoutManager(new LinearLayoutManager(getContext()));
-        audioList.setAdapter(audioListAdapter);
+            audioList.setHasFixedSize(true);
+            audioList.setLayoutManager(new LinearLayoutManager(getContext()));
+            audioList.setAdapter(audioListAdapter);
+        }
 
 //        player_play_btn.setClickable(false);
 //        player_play_btn.setEnabled(false);

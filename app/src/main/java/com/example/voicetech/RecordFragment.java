@@ -1,7 +1,5 @@
 package com.example.voicetech;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -17,8 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -30,9 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
 public class RecordFragment extends Fragment implements View.OnClickListener {
@@ -41,16 +35,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     private static final int RECORDER_SAMPLE_RATE = 8000;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
-
-
-    String[] permissions = new String[]{
-            Manifest.permission.INTERNET,
-            Manifest.permission.READ_PHONE_STATE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.VIBRATE,
-            Manifest.permission.RECORD_AUDIO,
-    };
 
     private NavController navController;
 //    private String recordPermission = Manifest.permission.RECORD_AUDIO;
@@ -83,7 +67,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        checkPermissions();
 
         bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLE_RATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
@@ -235,45 +218,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
 //        record_timer.setBase(SystemClock.elapsedRealtime() - pause_timer);
 //        record_timer.start();
 //        mediaRecorder.resume();
-//    }
-
-
-    private boolean checkPermissions() {
-        int result;
-        List<String> listPermissionsNeeded = new ArrayList<>();
-        for (String p : permissions) {
-            result = ContextCompat.checkSelfPermission(getContext(), p);
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                listPermissionsNeeded.add(p);
-            }
-        }
-        if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(getActivity(), listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), 100);
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == 100) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // do something
-            }
-            return;
-        }
-    }
-//    private boolean checkPermissions() {
-//        //Check permission
-//        if (ActivityCompat.checkSelfPermission(getContext(), recordPermission) == PackageManager.PERMISSION_GRANTED) {
-//            //Permission Granted
-//            return true;
-//        } else {
-//            //Permission not granted, ask for permission
-//            ActivityCompat.requestPermissions(getActivity(), new String[]{recordPermission}, PERMISSION_CODE);
-//            return false;
-//        }
 //    }
 
     private String getTempFilename() {
