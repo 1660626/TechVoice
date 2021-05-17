@@ -11,5 +11,17 @@
     <color name="pink">#fbdefa</color>
     <color name="blue_500">#4176fa</color>
     <color name="white_pink_100"> #f9f2fe</color>
+    <color name="red_200">#ec5564</color>
+    <color name="red_300">#d94452</color>
+
+    <color name="bluejean_100">#73b1f4</color>
+    <color name="bluejean_200">#5e9cea</color>
+    <color name="bluejean_300">#4b89da</color>
+    <color name="ocen_200">#C8A9DDFB</color>
+    <color name="ocen_100">#E2D4EFFF</color>
+    <color name="ocen_50">#39D4EFFF</color>
+    <color name="min_100">#62ddbd</color>
+    <color name="min_300">#35bb9b</color>
+
 
 </resources>

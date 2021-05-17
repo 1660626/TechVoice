@@ -4,15 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AudioListFragment"
-    android:background="@color/white_pink_100"
+    android:background="@color/ocen_50"
     >
-
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/audio_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
     <include layout="@layout/player_sheet" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

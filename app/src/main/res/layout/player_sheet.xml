@@ -39,7 +39,7 @@
             android:paddingTop="24dp"
             android:paddingBottom="24dp"
             android:text="Media Player"
-            android:textColor="@color/blue_500"
+            android:textColor="@color/bluejean_300"
             android:textSize="16sp" />
 
         <TextView
@@ -53,7 +53,7 @@
             android:paddingBottom="24dp"
             android:text="Not Playing"
             android:textAlignment="textEnd"
-            android:textColor="@color/blue_500"
+            android:textColor="@color/bluejean_300"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -68,7 +68,7 @@
         android:fontFamily="sans-serif-medium"
         android:text="File Name"
         android:textAlignment="center"
-        android:textColor="@color/blue_500"
+        android:textColor="@color/bluejean_300"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,7 +80,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginTop="10dp"
-        android:background="@color/pink"
+        android:background="@color/ocen_100"
         android:padding="16dp"
         android:scaleType="fitCenter"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,7 +92,7 @@
         android:id="@+id/player_back_btn"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:background="@color/pink"
+        android:background="@color/ocen_100"
         android:padding="16dp"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="@+id/player_play_btn"
@@ -105,7 +105,7 @@
         android:id="@+id/player_next_btn"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:background="@color/pink"
+        android:background="@color/ocen_100"
         android:padding="16dp"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="@+id/player_play_btn"
