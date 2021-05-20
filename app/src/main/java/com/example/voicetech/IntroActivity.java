@@ -25,12 +25,15 @@ public class IntroActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         requestPermissions();
+
     }
 
     String[] permissions = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.READ_CALL_LOG
     };
 
     private void requestPermissions() {
