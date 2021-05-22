@@ -1,11 +1,15 @@
 package com.example.voicetech;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +32,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 
-public class AudioListFragment extends Fragment implements AudioListAdapter.onItemListClick, View.OnClickListener  {
+public class AudioListFragment extends Fragment implements AudioListAdapter.onItemListClick, View.OnClickListener {
+
+    private MediaPlayerService player;
+    boolean serviceBound = false;
 
     private static AudioListFragment instance = null;
 
@@ -46,9 +53,8 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     private File[] allFiles;
     private AudioListAdapter audioListAdapter;
 
-    private MediaPlayer mediaPlayer = null;
-    private boolean isPlaying = false;
-    private File fileToPlay = null;
+    //    private MediaPlayer mediaPlayer = null;
+    public File fileToPlay = null;
 
     private Handler seekbarHandler;
     private Runnable updateSeekbar;
@@ -103,7 +109,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 }
             }
         });
-        if( allFiles != null ) {
+        if (allFiles != null) {
             audioListAdapter = new AudioListAdapter(allFiles, this);
 
             audioList.setHasFixedSize(true);
@@ -143,35 +149,66 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                pauseAudio();
+                player.pauseMedia();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int progress = seekBar.getProgress();
-                mediaPlayer.seekTo(progress);
-                resumeAudio();
+                player.mediaPlayer.seekTo(progress);
+                player.resumeMedia();
             }
         });
 
         instance = this;
     }
 
+    //Binding this Client to the AudioPlayer Service
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
+            player = binder.getService();
+            serviceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            serviceBound = false;
+        }
+    };
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean("ServiceState", serviceBound);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (serviceBound) {
+            getActivity().unbindService(serviceConnection);
+            //service is active
+            player.stopSelf();
+        }
+    }
+
     @Override
     public void onClickListener(File file, int position) {
-//        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-//        mediaMetadataRetriever.setDataSource(file.getAbsolutePath());
-//        String durationStr = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-
-        positionFile = position;
-        System.out.println(positionFile);
-
         fileToPlay = file;
-        if (isPlaying) {
-            stopAudio();
-            playAudio(fileToPlay);
+
+        if(!serviceBound) {
+            positionFile = position;
+            System.out.println("serviceBound:" + serviceBound);
+            Intent playerIntent = new Intent(getActivity(), MediaPlayerService.class);
+            playerIntent.putExtra("media", fileToPlay.getAbsolutePath());
+            getActivity().startService(playerIntent);
+            getActivity().bindService(playerIntent, serviceConnection, getActivity().BIND_AUTO_CREATE);
         } else {
-            playAudio(fileToPlay);
+            player.resetMedia();
         }
     }
 
@@ -187,22 +224,22 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             public void onClick(DialogInterface dialog, int which) {
 
                 System.out.println(position);
-                        audioListAdapter.notifyItemRemoved(position);
-                        audioListAdapter.notifyItemRangeChanged(position, allFiles.length);
-                        allFiles = changeArray(position);
-                        audioListAdapter = new AudioListAdapter(allFiles, AudioListFragment.this);
+                audioListAdapter.notifyItemRemoved(position);
+                audioListAdapter.notifyItemRangeChanged(position, allFiles.length);
+                allFiles = changeArray(position);
+                audioListAdapter = new AudioListAdapter(allFiles, AudioListFragment.this);
 
-                        audioList.setHasFixedSize(true);
-                        audioList.setLayoutManager(new LinearLayoutManager(getContext()));
-                        audioList.setAdapter(audioListAdapter);
+                audioList.setHasFixedSize(true);
+                audioList.setLayoutManager(new LinearLayoutManager(getContext()));
+                audioList.setAdapter(audioListAdapter);
 
 
-                        String path = Environment.getExternalStorageDirectory().getPath();
+                String path = Environment.getExternalStorageDirectory().getPath();
 
-                        File directory = new File(path);
-                        File filedelete = new File(directory, file.getName());
-                        Toast.makeText(getContext(), "Bạn đã xoá thành công file" + file.getName(), Toast.LENGTH_SHORT).show();
-                        boolean deleted = filedelete.delete();
+                File directory = new File(path);
+                File filedelete = new File(directory, file.getName());
+                Toast.makeText(getContext(), "Bạn đã xoá thành công file" + file.getName(), Toast.LENGTH_SHORT).show();
+                boolean deleted = filedelete.delete();
                 dialog.dismiss();
             }
         });
@@ -221,8 +258,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         alert.show();
 
 
-
-
     }
 
     private File[] changeArray(int positionDelete) {
@@ -239,57 +274,36 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         return newFiles;
     }
 
-    public void pauseAudio() {
-        mediaPlayer.pause();
+    public void pauseAudioUI() {
         player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.play, null));
-        isPlaying = false;
         seekbarHandler.removeCallbacks(updateSeekbar);
     }
 
-    public void resumeAudio() {
-        mediaPlayer.start();
+    public void resumeAudioUI() {
         player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.pause, null));
-        isPlaying = true;
-
         updateRunnable();
         seekbarHandler.postDelayed(updateSeekbar, 0);
 
     }
 
-    private void stopAudio() {
+    public void stopAudioUI() {
         //Stop The Audio
         player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.play, null));
         player_header_title.setText("Stopped");
-        isPlaying = false;
-        mediaPlayer.stop();
         seekbarHandler.removeCallbacks(updateSeekbar);
     }
 
-    private void playAudio(File fileToPlay) {
+    public void setupUIAudio() {
 
-        mediaPlayer = new MediaPlayer();
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        try {
-            mediaPlayer.setDataSource(fileToPlay.getAbsolutePath());
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.pause, null));
         player_filename.setText(fileToPlay.getName());
         player_header_title.setText("Playing");
-        //Play the audio
-        isPlaying = true;
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                stopAudio();
-                player_header_title.setText("Finished");
-            }
-        });
 
-        player_seekbar.setMax(mediaPlayer.getDuration());
+        if (player != null) {
+            player_seekbar.setMax(player.mediaPlayer.getDuration());
+        }
 
         seekbarHandler = new Handler();
         updateRunnable();
@@ -297,12 +311,23 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
     }
 
+    public void setTitlePlayer() {
+        player_header_title.setText("Finished");
+    }
+
     private void updateRunnable() {
         updateSeekbar = new Runnable() {
             @Override
             public void run() {
-                player_seekbar.setProgress(mediaPlayer.getCurrentPosition());
-                seekbarHandler.postDelayed(this, 100);
+                try {
+                    if (player != null) {
+                        player_seekbar.setProgress(player.mediaPlayer.getCurrentPosition());
+                    }
+                    seekbarHandler.postDelayed(this, 100);
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                    player.stopSelf();
+                }
             }
         };
     }
@@ -310,87 +335,55 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     @Override
     public void onStop() {
         super.onStop();
-        if (isPlaying) {
-            stopAudio();
-        }
+//        player.stopMedia();
     }
 
     public void setPauseAudio() {
-        if (isPlaying) {
-            pauseAudio();
-        }
+        player.pauseMedia();
     }
 
     @Override
     public void onClick(View v) {
+        boolean isPlaying = player.mediaPlayer.isPlaying();
+
         switch (v.getId()) {
             case R.id.player_play_btn:
                 if (isPlaying) {
-                    pauseAudio();
+                    player.pauseMedia();
+
                 } else {
                     if (fileToPlay != null) {
-                        resumeAudio();
+                        player.resumeMedia();
                     }
                 }
                 break;
             case R.id.player_back_btn:
-                if (positionFile == 0) {
-                    fileToPlay = allFiles[positionFile];
-                    if (isPlaying) {
-                        stopAudio();
-                        playAudio(fileToPlay);
-                    } else {
-                        playAudio(fileToPlay);
-                    }
-                } else {
+                if (positionFile != 0) {
                     positionFile--;
                     System.out.println(positionFile);
-                    fileToPlay = allFiles[positionFile];
-                    if (isPlaying) {
-                        stopAudio();
-                        playAudio(fileToPlay);
-                    } else {
-                        playAudio(fileToPlay);
-                    }
+                } else {
+                    positionFile = allFiles.length - 1;
                 }
+                fileToPlay = allFiles[positionFile];
+                player.resetMedia();
                 break;
             case R.id.player_next_btn:
                 if (positionFile == 0) {
-                    fileToPlay = allFiles[positionFile];
-                    if (isPlaying) {
-                        stopAudio();
-                        playAudio(fileToPlay);
-                    } else {
-                        playAudio(fileToPlay);
-                    }
                     positionFile++;
-
+                    fileToPlay = allFiles[positionFile];
                 } else {
                     if (positionFile == (allFiles.length - 1)) {
                         positionFile = 0;
                         fileToPlay = allFiles[positionFile];
-                        if (isPlaying) {
-                            stopAudio();
-                            playAudio(fileToPlay);
-                        } else {
-                            playAudio(fileToPlay);
-                        }
                     } else {
+                        positionFile++;
                         System.out.println(positionFile);
                         fileToPlay = allFiles[positionFile];
-                        if (isPlaying) {
-                            stopAudio();
-                            playAudio(fileToPlay);
-                        } else {
-                            playAudio(fileToPlay);
-                        }
-                        positionFile++;
 
                     }
                 }
+                player.resetMedia();
                 break;
         }
     }
-
-
 }
