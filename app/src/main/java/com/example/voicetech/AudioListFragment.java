@@ -28,7 +28,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 
-public class AudioListFragment extends Fragment implements AudioListAdapter.onItemListClick {
+public class AudioListFragment extends Fragment implements AudioListAdapter.onItemListClick, View.OnClickListener  {
+
+    private static AudioListFragment instance = null;
+
     private TextView player_header_title;
     private TextView player_filename;
 
@@ -54,6 +57,9 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     public AudioListFragment() {
     }
 
+    public static AudioListFragment getInstance() {
+        return instance;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -75,6 +81,11 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         player_back_btn = view.findViewById(R.id.player_back_btn);
         player_next_btn = view.findViewById(R.id.player_next_btn);
         player_seekbar = view.findViewById(R.id.player_seekbar);
+
+        //set Event
+        player_play_btn.setOnClickListener(this);
+        player_back_btn.setOnClickListener(this);
+        player_next_btn.setOnClickListener(this);
 
         player_header_title = view.findViewById(R.id.player_header_title);
         player_filename = view.findViewById(R.id.player_filename);
@@ -123,81 +134,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             }
         });
 
-        player_play_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isPlaying) {
-                    pauseAudio();
-                } else {
-                    if (fileToPlay != null) {
-                        resumeAudio();
-                    }
-                }
-            }
-        });
-        player_back_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (positionFile == 0) {
-                    fileToPlay = allFiles[positionFile];
-                    if (isPlaying) {
-                        stopAudio();
-                        playAudio(fileToPlay);
-                    } else {
-                        playAudio(fileToPlay);
-                    }
-                } else {
-                    positionFile--;
-                    System.out.println(positionFile);
-                    fileToPlay = allFiles[positionFile];
-                    if (isPlaying) {
-                        stopAudio();
-                        playAudio(fileToPlay);
-                    } else {
-                        playAudio(fileToPlay);
-                    }
-                }
-            }
-        });
-        player_next_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (positionFile == 0) {
-                    fileToPlay = allFiles[positionFile];
-                    if (isPlaying) {
-                        stopAudio();
-                        playAudio(fileToPlay);
-                    } else {
-                        playAudio(fileToPlay);
-                    }
-                    positionFile++;
-
-                } else {
-                    if (positionFile == (allFiles.length - 1)) {
-                        positionFile = 0;
-                        fileToPlay = allFiles[positionFile];
-                        if (isPlaying) {
-                            stopAudio();
-                            playAudio(fileToPlay);
-                        } else {
-                            playAudio(fileToPlay);
-                        }
-                    } else {
-                        System.out.println(positionFile);
-                        fileToPlay = allFiles[positionFile];
-                        if (isPlaying) {
-                            stopAudio();
-                            playAudio(fileToPlay);
-                        } else {
-                            playAudio(fileToPlay);
-                        }
-                        positionFile++;
-
-                    }
-                }
-
-            }
-        });
 
         player_seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -217,6 +153,8 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 resumeAudio();
             }
         });
+
+        instance = this;
     }
 
     @Override
@@ -301,14 +239,14 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         return newFiles;
     }
 
-    private void pauseAudio() {
+    public void pauseAudio() {
         mediaPlayer.pause();
         player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.play, null));
         isPlaying = false;
         seekbarHandler.removeCallbacks(updateSeekbar);
     }
 
-    private void resumeAudio() {
+    public void resumeAudio() {
         mediaPlayer.start();
         player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.pause, null));
         isPlaying = true;
@@ -376,5 +314,83 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             stopAudio();
         }
     }
+
+    public void setPauseAudio() {
+        if (isPlaying) {
+            pauseAudio();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.player_play_btn:
+                if (isPlaying) {
+                    pauseAudio();
+                } else {
+                    if (fileToPlay != null) {
+                        resumeAudio();
+                    }
+                }
+                break;
+            case R.id.player_back_btn:
+                if (positionFile == 0) {
+                    fileToPlay = allFiles[positionFile];
+                    if (isPlaying) {
+                        stopAudio();
+                        playAudio(fileToPlay);
+                    } else {
+                        playAudio(fileToPlay);
+                    }
+                } else {
+                    positionFile--;
+                    System.out.println(positionFile);
+                    fileToPlay = allFiles[positionFile];
+                    if (isPlaying) {
+                        stopAudio();
+                        playAudio(fileToPlay);
+                    } else {
+                        playAudio(fileToPlay);
+                    }
+                }
+                break;
+            case R.id.player_next_btn:
+                if (positionFile == 0) {
+                    fileToPlay = allFiles[positionFile];
+                    if (isPlaying) {
+                        stopAudio();
+                        playAudio(fileToPlay);
+                    } else {
+                        playAudio(fileToPlay);
+                    }
+                    positionFile++;
+
+                } else {
+                    if (positionFile == (allFiles.length - 1)) {
+                        positionFile = 0;
+                        fileToPlay = allFiles[positionFile];
+                        if (isPlaying) {
+                            stopAudio();
+                            playAudio(fileToPlay);
+                        } else {
+                            playAudio(fileToPlay);
+                        }
+                    } else {
+                        System.out.println(positionFile);
+                        fileToPlay = allFiles[positionFile];
+                        if (isPlaying) {
+                            stopAudio();
+                            playAudio(fileToPlay);
+                        } else {
+                            playAudio(fileToPlay);
+                        }
+                        positionFile++;
+
+                    }
+                }
+                break;
+        }
+    }
+
 
 }

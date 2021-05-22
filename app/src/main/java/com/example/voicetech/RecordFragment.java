@@ -138,35 +138,52 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.record_btn:
-                record_stop_btn.setVisibility(View.VISIBLE);
-                record_pause_btn.setVisibility(View.VISIBLE);
-                record_list_btn.setVisibility(View.INVISIBLE);
-                record_btn.setVisibility(View.INVISIBLE);
+                setRecordInitialBtn();
                 startRecording(false);
 
                 break;
             case R.id.record_pause_btn:
-
+                setRecordPauseBtn();
                 stopRecording(false);
                 break;
             case R.id.record_play_btn:
-                record_play_btn.setVisibility(View.INVISIBLE);
-                record_pause_btn.setVisibility(View.VISIBLE);
+                setRecordPlayBtn();
                 startRecording(true);
                 break;
             case R.id.record_stop_btn:
-                record_play_btn.setVisibility(View.INVISIBLE);
-                record_stop_btn.setVisibility(View.INVISIBLE);
-                record_pause_btn.setVisibility(View.INVISIBLE);
-                record_list_btn.setVisibility(View.VISIBLE);
-                record_btn.setVisibility(View.VISIBLE);
+                setRecordStopBtn();
                 stopRecording(true);
                 break;
         }
 
     }
 
-    private void startRecording(final boolean b) {
+    public void setRecordInitialBtn() {
+        record_stop_btn.setVisibility(View.VISIBLE);
+        record_pause_btn.setVisibility(View.VISIBLE);
+        record_list_btn.setVisibility(View.INVISIBLE);
+        record_btn.setVisibility(View.INVISIBLE);
+    }
+
+    public void setRecordPauseBtn() {
+        record_pause_btn.setVisibility(View.INVISIBLE);
+        record_play_btn.setVisibility(View.VISIBLE);
+    }
+
+    public void setRecordPlayBtn() {
+        record_play_btn.setVisibility(View.INVISIBLE);
+        record_pause_btn.setVisibility(View.VISIBLE);
+    }
+
+    public void setRecordStopBtn() {
+        record_play_btn.setVisibility(View.INVISIBLE);
+        record_stop_btn.setVisibility(View.INVISIBLE);
+        record_pause_btn.setVisibility(View.INVISIBLE);
+        record_list_btn.setVisibility(View.VISIBLE);
+        record_btn.setVisibility(View.VISIBLE);
+    }
+
+    public void startRecording(final boolean b) {
 
 
         if (b == false) {   //Start record
@@ -220,8 +237,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
             record_timer.stop();
         }
         if (b == false) { // pause record
-            record_pause_btn.setVisibility(View.INVISIBLE);
-            record_play_btn.setVisibility(View.VISIBLE);
             record_filename.setText("Pause recording.....");
 
             record_timer.stop();

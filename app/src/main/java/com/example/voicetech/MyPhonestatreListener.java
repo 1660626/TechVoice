@@ -25,11 +25,12 @@ public class MyPhonestatreListener extends PhoneStateListener {
                 isIncoming = true;
                 callStartTime = new Date();
                 //Toast.makeText(context, "Incoming Call Ringing " + phoneNumber, Toast.LENGTH_SHORT).show();
-//                RecordFragment
-//                RecordFragment  recordFragment = new  RecordFragment();
-//                recordFragment.getinfor();
                 RecordFragment.getInstance().stopRecording(false);
+                RecordFragment.getInstance().setRecordPauseBtn();
 
+                if (AudioListFragment.getInstance() != null) {
+                    AudioListFragment.getInstance().setPauseAudio();
+                }
                 break;
             case TelephonyManager.CALL_STATE_OFFHOOK:
                 if(lastState != TelephonyManager.CALL_STATE_RINGING){
