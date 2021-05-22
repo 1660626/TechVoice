@@ -31,6 +31,8 @@ import java.util.Date;
 
 public class RecordFragment extends Fragment implements View.OnClickListener {
 
+    private static RecordFragment instance;
+
     private static final int RECORDER_BPP = 16;
     private static final int RECORDER_SAMPLE_RATE = 8000;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
@@ -51,14 +53,23 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     private AudioRecord recorder = null;
     private int bufferSize = 0;
     private Thread recordingThread = null;
-    private TextView record_filename;
+    public TextView record_filename;
     private String recordFile;
 //    private String recordFileFinal;
 
 
     public RecordFragment() {
+
+    }
+    public static RecordFragment getInstance() {
+        return instance;
     }
 
+    public void myMethod() {
+        // do something...
+        System.out.println(record_timer.getText());
+
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_record, container, false);
@@ -91,17 +102,17 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         record_play_btn.setOnClickListener(this);
         record_pause_btn.setOnClickListener(this);
         record_stop_btn.setOnClickListener(this);
-
+        instance = this;
     }
 
-    public void onPause () {
-        super.onPause();
-        if ( isRecording ) {
-            record_pause_btn.setVisibility(View.INVISIBLE);
-            record_play_btn.setVisibility(View.VISIBLE);
-            stopRecording(false);
-        }
-    }
+//    public void onPause () {
+//        super.onPause();
+//        if ( isRecording ) {
+//            record_pause_btn.setVisibility(View.INVISIBLE);
+//            record_play_btn.setVisibility(View.VISIBLE);
+//            stopRecording(false);
+//        }
+//    }
 
     @Override
     public void onClick(View v) {
@@ -135,8 +146,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
 
                 break;
             case R.id.record_pause_btn:
-                record_pause_btn.setVisibility(View.INVISIBLE);
-                record_play_btn.setVisibility(View.VISIBLE);
+
                 stopRecording(false);
                 break;
             case R.id.record_play_btn:
@@ -184,8 +194,10 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         }, "AudioRecorder Thread");
         recordingThread.start();
     }
+    public void getinfor() {
 
-    private void stopRecording(boolean b) {
+    }
+    public void stopRecording(boolean b) {
 
 
         if (recorder != null) {
@@ -208,6 +220,8 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
             record_timer.stop();
         }
         if (b == false) { // pause record
+            record_pause_btn.setVisibility(View.INVISIBLE);
+            record_play_btn.setVisibility(View.VISIBLE);
             record_filename.setText("Pause recording.....");
 
             record_timer.stop();

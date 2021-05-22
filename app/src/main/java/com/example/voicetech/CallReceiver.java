@@ -15,7 +15,9 @@ public class CallReceiver extends BroadcastReceiver {
 //   System.out.println(intent.getAction().toString());
 
         TelephonyManager telephony = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+
         MyPhonestatreListener customPhoneListener = new MyPhonestatreListener();
+
         telephony.listen(customPhoneListener, PhoneStateListener.LISTEN_CALL_STATE);
 
         Bundle bundle = intent.getExtras();
