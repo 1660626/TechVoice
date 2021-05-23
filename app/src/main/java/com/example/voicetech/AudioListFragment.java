@@ -369,11 +369,14 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                     }
                     break;
                 case R.id.player_back_btn:
-                    if (positionFile != 0) {
+                    if (positionFile == 0) {
+                        positionFile = allFiles.length - 1;
+
+                    } else if (positionFile < (allFiles.length - 1)) {
                         positionFile--;
                         System.out.println(positionFile);
                     } else {
-                        positionFile = allFiles.length - 1;
+                        positionFile = 0;
                     }
                     fileToPlay = allFiles[positionFile];
                     player.resetMedia();
@@ -386,11 +389,13 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                         if (positionFile == (allFiles.length - 1)) {
                             positionFile = 0;
                             fileToPlay = allFiles[positionFile];
-                        } else {
+                        } else if (positionFile < (allFiles.length - 1)) {
                             positionFile++;
                             System.out.println(positionFile);
                             fileToPlay = allFiles[positionFile];
 
+                        } else {
+                            fileToPlay = allFiles[0];
                         }
                     }
                     player.resetMedia();
