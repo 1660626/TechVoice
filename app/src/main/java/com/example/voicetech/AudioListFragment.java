@@ -117,15 +117,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             audioList.setAdapter(audioListAdapter);
         }
 
-//        player_play_btn.setClickable(false);
-//        player_play_btn.setEnabled(false);
-//        player_back_btn.setClickable(false);
-//        player_back_btn.setEnabled(false);
-//        player_next_btn.setClickable(false);
-//        player_next_btn.setEnabled(false);
-//        player_seekbar.setClickable(false);
-//        player_seekbar.setEnabled(false);
-
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -149,14 +140,23 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                player.pauseMedia();
+                if(player != null) {
+                    player.pauseMedia();
+                    player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.play, null));
+                    seekbarHandler.removeCallbacks(updateSeekbar);
+                }
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                int progress = seekBar.getProgress();
-                player.mediaPlayer.seekTo(progress);
-                player.resumeMedia();
+                if(player != null) {
+                    int progress = seekBar.getProgress();
+                    player.resumeMedia();
+                    player.mediaPlayer.seekTo(progress);
+
+                    updateRunnable();
+                    seekbarHandler.postDelayed(updateSeekbar, 0);
+                }
             }
         });
 
@@ -200,7 +200,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     public void onClickListener(File file, int position) {
         fileToPlay = file;
 
-        if(!serviceBound) {
+        if (!serviceBound) {
             positionFile = position;
             System.out.println("serviceBound:" + serviceBound);
             Intent playerIntent = new Intent(getActivity(), MediaPlayerService.class);
@@ -335,55 +335,60 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     @Override
     public void onStop() {
         super.onStop();
-//        player.stopMedia();
+        if ( player != null ) {
+            seekbarHandler.removeCallbacks(updateSeekbar);
+        }
     }
 
     public void setPauseAudio() {
-        player.pauseMedia();
+        if ( player != null ) {
+            player.pauseMedia();
+        }
     }
 
     @Override
     public void onClick(View v) {
-        boolean isPlaying = player.mediaPlayer.isPlaying();
+        if (player != null) {
+            boolean isPlaying = player.mediaPlayer.isPlaying();
+            switch (v.getId()) {
+                case R.id.player_play_btn:
+                    if (isPlaying) {
+                        player.pauseMedia();
 
-        switch (v.getId()) {
-            case R.id.player_play_btn:
-                if (isPlaying) {
-                    player.pauseMedia();
-
-                } else {
-                    if (fileToPlay != null) {
-                        player.resumeMedia();
+                    } else {
+                        if (fileToPlay != null) {
+                            player.resumeMedia();
+                        }
                     }
-                }
-                break;
-            case R.id.player_back_btn:
-                if (positionFile != 0) {
-                    positionFile--;
-                    System.out.println(positionFile);
-                } else {
-                    positionFile = allFiles.length - 1;
-                }
-                fileToPlay = allFiles[positionFile];
-                player.resetMedia();
-                break;
-            case R.id.player_next_btn:
-                if (positionFile == 0) {
-                    positionFile++;
+                    break;
+                case R.id.player_back_btn:
+                    if (positionFile != 0) {
+                        positionFile--;
+                        System.out.println(positionFile);
+                    } else {
+                        positionFile = allFiles.length - 1;
+                    }
                     fileToPlay = allFiles[positionFile];
-                } else {
-                    if (positionFile == (allFiles.length - 1)) {
-                        positionFile = 0;
+                    player.resetMedia();
+                    break;
+                case R.id.player_next_btn:
+                    if (positionFile == 0) {
+                        positionFile++;
                         fileToPlay = allFiles[positionFile];
                     } else {
-                        positionFile++;
-                        System.out.println(positionFile);
-                        fileToPlay = allFiles[positionFile];
+                        if (positionFile == (allFiles.length - 1)) {
+                            positionFile = 0;
+                            fileToPlay = allFiles[positionFile];
+                        } else {
+                            positionFile++;
+                            System.out.println(positionFile);
+                            fileToPlay = allFiles[positionFile];
 
+                        }
                     }
-                }
-                player.resetMedia();
-                break;
+                    player.resetMedia();
+                    break;
+            }
         }
     }
 }
