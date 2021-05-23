@@ -32,6 +32,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 
+
 public class AudioListFragment extends Fragment implements AudioListAdapter.onItemListClick, View.OnClickListener {
 
     private MediaPlayerService player;
@@ -159,7 +160,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 }
             }
         });
-
         instance = this;
     }
 
@@ -273,6 +273,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         }
         return newFiles;
     }
+
 
     public void pauseAudioUI() {
         player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.play, null));
