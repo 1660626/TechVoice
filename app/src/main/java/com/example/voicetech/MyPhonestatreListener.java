@@ -29,7 +29,6 @@ public class MyPhonestatreListener extends PhoneStateListener {
 //                RecordFragment  recordFragment = new  RecordFragment();
 //                recordFragment.getinfor();
                 RecordFragment.getInstance().stopRecording(false);
-
                 break;
             case TelephonyManager.CALL_STATE_OFFHOOK:
                 if(lastState != TelephonyManager.CALL_STATE_RINGING){

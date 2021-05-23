@@ -29,6 +29,11 @@ import java.io.IOException;
 
 
 public class AudioListFragment extends Fragment implements AudioListAdapter.onItemListClick {
+
+    private static AudioListFragment instance;
+    public static AudioListFragment getInstance() {
+        return instance;
+    }
     private TextView player_header_title;
     private TextView player_filename;
 
@@ -217,6 +222,8 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 resumeAudio();
             }
         });
+        instance = this;
+
     }
 
     @Override
@@ -301,7 +308,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         return newFiles;
     }
 
-    private void pauseAudio() {
+    public void pauseAudio() {
         mediaPlayer.pause();
         player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.play, null));
         isPlaying = false;
