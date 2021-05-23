@@ -229,7 +229,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         if (b == true) { //end record
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
             Date now = new Date();
-            recordFile = "Recording_" + formatter.format(now);
+            recordFile = "Record_" + formatter.format(now);
             record_filename.setText(recordFile);
             copyWaveFile(getTempFilename(), getFilename());
             deleteTempFile();

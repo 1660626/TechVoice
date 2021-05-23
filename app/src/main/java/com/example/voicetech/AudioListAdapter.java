@@ -35,6 +35,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
     public void onBindViewHolder(@NonNull AudioViewHolder holder, int position) {
         holder.list_title.setText(allFiles[position].getName());
         holder.list_date.setText(timeAgo.getTimeAgo(allFiles[position].lastModified()));
+        holder.tv_duration.setText(Utils.getDurationString(allFiles[position]));
     }
 
     @Override
@@ -47,6 +48,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
         private ImageView list_image;
         private TextView list_title;
         private TextView list_date;
+        private TextView tv_duration;
 
         public AudioViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -54,6 +56,7 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
             list_image = itemView.findViewById(R.id.list_image_view);
             list_title = itemView.findViewById(R.id.list_title);
             list_date = itemView.findViewById(R.id.list_date);
+            tv_duration = itemView.findViewById(R.id.tv_duration);
 
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);

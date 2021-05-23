@@ -37,11 +37,13 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
     private MediaPlayerService player;
     boolean serviceBound = false;
+    boolean isStopBySystem = false;
 
     private static AudioListFragment instance = null;
 
     private TextView player_header_title;
     private TextView player_filename;
+    private TextView player_time;
 
     private ImageButton player_play_btn, player_back_btn, player_next_btn;
 
@@ -88,6 +90,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         player_back_btn = view.findViewById(R.id.player_back_btn);
         player_next_btn = view.findViewById(R.id.player_next_btn);
         player_seekbar = view.findViewById(R.id.player_seekbar);
+        player_time = view.findViewById(R.id.player_time);
 
         //set Event
         player_play_btn.setOnClickListener(this);
@@ -208,6 +211,9 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             getActivity().startService(playerIntent);
             getActivity().bindService(playerIntent, serviceConnection, getActivity().BIND_AUTO_CREATE);
         } else {
+            if ( player != null ) {
+                seekbarHandler.removeCallbacks(updateSeekbar);
+            }
             player.resetMedia();
         }
     }
@@ -302,8 +308,8 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         player_filename.setText(fileToPlay.getName());
         player_header_title.setText("Playing");
 
-        if (player != null) {
-            player_seekbar.setMax(player.mediaPlayer.getDuration());
+        if (player != null && player.mediaPlayer != null) {
+            player_seekbar.setMax(Utils.getDurationInt(fileToPlay));
         }
 
         seekbarHandler = new Handler();
@@ -321,10 +327,12 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             @Override
             public void run() {
                 try {
-                    if (player != null) {
+                    if (player != null && !isStopBySystem) {
                         player_seekbar.setProgress(player.mediaPlayer.getCurrentPosition());
+                        player_time.setText(Utils.formatMilliSecond(player.mediaPlayer.getCurrentPosition()));
+                        seekbarHandler.postDelayed(this, 100);
+
                     }
-                    seekbarHandler.postDelayed(this, 100);
                 } catch (IllegalStateException e) {
                     e.printStackTrace();
                     player.stopSelf();
@@ -336,9 +344,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     @Override
     public void onStop() {
         super.onStop();
-        if ( player != null ) {
-            seekbarHandler.removeCallbacks(updateSeekbar);
-        }
+        isStopBySystem = true;
     }
 
     public void setPauseAudio() {
