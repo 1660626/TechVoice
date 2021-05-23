@@ -107,8 +107,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                     case TelephonyManager.CALL_STATE_OFFHOOK:
                     case TelephonyManager.CALL_STATE_RINGING:
                         if (mediaPlayer != null) {
-                            pauseMedia();
                             ongoingCall = true;
+                            pauseMedia();
                         }
                         break;
                     case TelephonyManager.CALL_STATE_IDLE:
@@ -157,6 +157,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             mediaPlayer.seekTo(resumePosition);
             mediaPlayer.start();
             AudioListFragment.getInstance().resumeAudioUI();
+            AudioListFragment.getInstance().isStopBySystem = false;
         }
     }
 
