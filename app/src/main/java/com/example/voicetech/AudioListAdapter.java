@@ -26,7 +26,8 @@ public class AudioListAdapter extends RecyclerView.Adapter<AudioListAdapter.Audi
     @NonNull
     @Override
     public AudioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_list_item,
+                parent, false);
         timeAgo = new TimeAgo();
         return new AudioViewHolder(view);
     }

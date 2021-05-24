@@ -211,24 +211,17 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
         builder.setTitle("Confirm");
         builder.setMessage("Are you sure delete file: " + file.getName() + " ? ");
-
         builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
             public void onClick(DialogInterface dialog, int which) {
-
                 System.out.println(position);
                 audioListAdapter.notifyItemRemoved(position);
                 audioListAdapter.notifyItemRangeChanged(position, allFiles.length);
                 allFiles = changeArray(position);
                 audioListAdapter = new AudioListAdapter(allFiles, AudioListFragment.this);
-
                 audioList.setHasFixedSize(true);
                 audioList.setLayoutManager(new LinearLayoutManager(getContext()));
                 audioList.setAdapter(audioListAdapter);
-
-
                 String path = Environment.getExternalStorageDirectory().getPath();
-
                 File directory = new File(path);
                 File filedelete = new File(directory, file.getName());
                 Toast.makeText(getContext(), "Bạn đã xoá thành công file" + file.getName(), Toast.LENGTH_SHORT).show();
@@ -236,31 +229,22 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 dialog.dismiss();
             }
         });
-
         builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
-                // Do nothing
                 dialog.dismiss();
             }
         });
-
         AlertDialog alert = builder.create();
         alert.show();
-
-
     }
 
     private File[] changeArray(int positionDelete) {
         File[] newFiles = new File[allFiles.length - 1];
         for (int i = 0, k = 0; i < allFiles.length; i++) {
-
             if (i == positionDelete) {
                 continue;
             }
-
             // else copy the element
             newFiles[k++] = allFiles[i];
         }

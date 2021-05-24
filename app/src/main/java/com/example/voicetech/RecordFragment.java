@@ -65,7 +65,8 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLE_RATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
+        bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLE_RATE,
+                RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
         // find id
         navController = Navigation.findNavController(view);
@@ -106,11 +107,9 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
             case R.id.record_list_btn:
                 navController.navigate(R.id.action_recordFragment_to_audioListFragment);
                 break;
-
             case R.id.record_btn:
                 setRecordInitialBtn();
                 startRecording(false);
-
                 break;
             case R.id.record_pause_btn:
                 setRecordPauseBtn();
@@ -125,7 +124,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
                 stopRecording(true);
                 break;
         }
-
     }
 
     public void setRecordInitialBtn() {
@@ -154,25 +152,21 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     }
 
     public void startRecording(final boolean b) {
-
-
         if (b == false) {   //Start record
             record_timer.setBase(SystemClock.elapsedRealtime());
             record_timer.start();
-
             record_filename.setText("Recording.....");
-
         }
         if (b == true) {  //continues record
             record_filename.setText("Recording.....");
-
             record_timer.setBase(SystemClock.elapsedRealtime() - pause_timer);
             record_timer.start();
         }
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, RECORDER_SAMPLE_RATE, RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING, bufferSize);
+        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                RECORDER_SAMPLE_RATE, RECORDER_CHANNELS,
+                RECORDER_AUDIO_ENCODING, bufferSize);
         recorder.startRecording();
         isRecording = true;
-
         recordingThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -183,8 +177,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     }
 
     public void stopRecording(boolean b) {
-
-
         if (recorder != null) {
             isRecording = false;
             recorder.stop();
@@ -206,7 +198,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         }
         if (b == false) { // pause record
             record_filename.setText("Pause recording.....");
-
             record_timer.stop();
             pause_timer = SystemClock.elapsedRealtime() - record_timer.getBase();
         }
@@ -244,18 +235,14 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     private void writeAudioDataToFile(boolean b) {
         byte data[] = new byte[bufferSize];
         String filename = getTempFilename();
-
         System.out.println(filename);
         FileOutputStream os = null;
-
         try {
             os = new FileOutputStream(filename, b);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
         int read = 0;
-
         if (os != null) {
             while (isRecording) {
                 read = recorder.read(data, 0, bufferSize);
@@ -268,7 +255,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
                     }
                 }
             }
-
             try {
                 os.close();
             } catch (IOException e) {
@@ -310,37 +296,23 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void WriteWaveFileHeader(
-            FileOutputStream out, long totalAudioLen,
+    private void WriteWaveFileHeader( FileOutputStream out, long totalAudioLen,
             long totalDataLen, long longSampleRate, int channels,
             long byteRate, String outFileName) throws IOException {
-
         byte[] header = new byte[44];
-
         header[0] = 'R';  // RIFF/WAVE header
-        header[1] = 'I';
-        header[2] = 'F';
-        header[3] = 'F';
+        header[1] = 'I';  header[2] = 'F';  header[3] = 'F';
         header[4] = (byte) (totalDataLen & 0xff);
         header[5] = (byte) ((totalDataLen >> 8) & 0xff);
         header[6] = (byte) ((totalDataLen >> 16) & 0xff);
         header[7] = (byte) ((totalDataLen >> 24) & 0xff);
-        header[8] = 'W';
-        header[9] = 'A';
-        header[10] = 'V';
-        header[11] = 'E';
+        header[8] = 'W'; header[9] = 'A'; header[10] = 'V';  header[11] = 'E';
         header[12] = 'f';  // 'fmt ' chunk
-        header[13] = 'm';
-        header[14] = 't';
-        header[15] = ' ';
+        header[13] = 'm'; header[14] = 't';  header[15] = ' ';
         header[16] = 16;  // 4 bytes: size of 'fmt ' chunk
-        header[17] = 0;
-        header[18] = 0;
-        header[19] = 0;
+        header[17] = 0;  header[18] = 0;   header[19] = 0;
         header[20] = 1;  // format = 1
-        header[21] = 0;
-        header[22] = (byte) channels;
-        header[23] = 0;
+        header[21] = 0;  header[22] = (byte) channels;  header[23] = 0;
         header[24] = (byte) (longSampleRate & 0xff);
         header[25] = (byte) ((longSampleRate >> 8) & 0xff);
         header[26] = (byte) ((longSampleRate >> 16) & 0xff);
@@ -353,15 +325,11 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         header[33] = 0;
         header[34] = RECORDER_BPP;  // bits per sample
         header[35] = 0;
-        header[36] = 'd';
-        header[37] = 'a';
-        header[38] = 't';
-        header[39] = 'a';
+        header[36] = 'd';  header[37] = 'a'; header[38] = 't'; header[39] = 'a';
         header[40] = (byte) (totalAudioLen & 0xff);
         header[41] = (byte) ((totalAudioLen >> 8) & 0xff);
         header[42] = (byte) ((totalAudioLen >> 16) & 0xff);
         header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
-
         RandomAccessFile rFile = new RandomAccessFile(outFileName, "rw");
         rFile.seek(0);
         rFile.write(header, 0, 44);

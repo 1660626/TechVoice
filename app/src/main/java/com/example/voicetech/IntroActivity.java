@@ -23,7 +23,6 @@ public class IntroActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
-
         requestPermissions();
 
     }
@@ -51,10 +50,8 @@ public class IntroActivity extends AppCompatActivity {
             this.setContentView(R.layout.activity_intro);
         }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-
         if (requestCode == 100) {
             boolean checkPermissions = true;
             for (int value : grantResults) {
@@ -63,7 +60,6 @@ public class IntroActivity extends AppCompatActivity {
                     break;
                 }
             }
-
             if (grantResults.length > 0 && checkPermissions) {
                 this.setContentView(R.layout.activity_intro);
             }
