@@ -31,45 +31,31 @@ import java.util.Date;
 
 public class RecordFragment extends Fragment implements View.OnClickListener {
 
-    private static RecordFragment instance;
-
     private static final int RECORDER_BPP = 16;
     private static final int RECORDER_SAMPLE_RATE = 8000;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
-
+    private static RecordFragment instance;
+    public TextView record_filename;
     private NavController navController;
-//    private String recordPermission = Manifest.permission.RECORD_AUDIO;
-
     private ImageButton record_btn, record_list_btn, record_play_btn, record_pause_btn, record_stop_btn;
     private Chronometer record_timer;
-
     private boolean isRecording = false;
-
-    //    private int PERMISSION_CODE = 21;
     private long pause_timer = 0;
-
-    private MediaRecorder mediaRecorder;
     private AudioRecord recorder = null;
     private int bufferSize = 0;
     private Thread recordingThread = null;
-    public TextView record_filename;
     private String recordFile;
-//    private String recordFileFinal;
 
 
     public RecordFragment() {
 
     }
+
     public static RecordFragment getInstance() {
         return instance;
     }
 
-    public void myMethod() {
-        // do something...
-        System.out.println(record_timer.getText());
-
-    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_record, container, false);
@@ -118,23 +104,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.record_list_btn:
-
-//                if(isRecording){
-//                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
-//                    alertDialog.setPositiveButton("OKAY", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            navController.navigate(R.id.action_recordFragment_to_audioListFragment);
-//                            isRecording = false;
-//                        }
-//                    });
-//                    alertDialog.setNegativeButton("CANCEL", null);
-//                    alertDialog.setTitle("Audio Still recording");
-//                    alertDialog.setMessage("Are you sure, you want to stop the recording?");
-//                    alertDialog.create().show();
-//                } else {
                 navController.navigate(R.id.action_recordFragment_to_audioListFragment);
-//                }
                 break;
 
             case R.id.record_btn:
@@ -211,9 +181,7 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         }, "AudioRecorder Thread");
         recordingThread.start();
     }
-    public void getinfor() {
 
-    }
     public void stopRecording(boolean b) {
 
 
@@ -245,18 +213,6 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
 
     }
 
-//    private void pauseRecording() {
-//        record_timer.stop();
-//        pause_timer = SystemClock.elapsedRealtime() - record_timer.getBase();
-//        mediaRecorder.pause();
-//    }
-//
-//    private void playRecording() {
-//
-//        record_timer.setBase(SystemClock.elapsedRealtime() - pause_timer);
-//        record_timer.start();
-//        mediaRecorder.resume();
-//    }
 
     private String getTempFilename() {
         String filepath = Environment.getExternalStorageDirectory().getPath();

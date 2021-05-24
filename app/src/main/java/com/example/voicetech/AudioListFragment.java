@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -29,39 +28,44 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
-
 
 
 public class AudioListFragment extends Fragment implements AudioListAdapter.onItemListClick, View.OnClickListener {
 
-    private MediaPlayerService player;
+    private static AudioListFragment instance = null;
+    //    private MediaPlayer mediaPlayer = null;
+    public File fileToPlay = null;
     boolean serviceBound = false;
     boolean isStopBySystem = false;
-
-    private static AudioListFragment instance = null;
-
+    private MediaPlayerService player;
     private TextView player_header_title;
     private TextView player_filename;
     private TextView player_time;
-
     private ImageButton player_play_btn, player_back_btn, player_next_btn;
-
     private SeekBar player_seekbar;
-
     private ConstraintLayout player_sheet;
     private BottomSheetBehavior bottomSheetBehavior;
-
     private RecyclerView audioList;
     private File[] allFiles;
     private AudioListAdapter audioListAdapter;
-
-    //    private MediaPlayer mediaPlayer = null;
-    public File fileToPlay = null;
-
     private Handler seekbarHandler;
     private Runnable updateSeekbar;
     private int positionFile = 0;
+    //Binding this Client to the AudioPlayer Service
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
+            player = binder.getService();
+            serviceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            serviceBound = false;
+        }
+    };
 
     public AudioListFragment() {
     }
@@ -75,7 +79,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_audio_list, container, false);
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -144,7 +147,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                if(player != null) {
+                if (player != null) {
                     player.pauseMedia();
                     player_play_btn.setImageDrawable(getActivity().getResources().getDrawable(R.drawable.play, null));
                     seekbarHandler.removeCallbacks(updateSeekbar);
@@ -153,7 +156,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(player != null) {
+                if (player != null) {
                     int progress = seekBar.getProgress();
                     player.resumeMedia();
                     player.mediaPlayer.seekTo(progress);
@@ -165,22 +168,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
         });
         instance = this;
     }
-
-    //Binding this Client to the AudioPlayer Service
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
-            player = binder.getService();
-            serviceBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            serviceBound = false;
-        }
-    };
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -211,7 +198,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             getActivity().startService(playerIntent);
             getActivity().bindService(playerIntent, serviceConnection, getActivity().BIND_AUTO_CREATE);
         } else {
-            if ( player != null ) {
+            if (player != null) {
                 seekbarHandler.removeCallbacks(updateSeekbar);
             }
             player.resetMedia();
@@ -348,7 +335,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     }
 
     public void setPauseAudio() {
-        if ( player != null ) {
+        if (player != null) {
             player.pauseMedia();
         }
     }
