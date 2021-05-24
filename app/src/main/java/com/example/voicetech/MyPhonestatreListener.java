@@ -28,6 +28,7 @@ public class MyPhonestatreListener extends PhoneStateListener {
                 if (lastState != TelephonyManager.CALL_STATE_RINGING) {
                     isIncoming = false;
                     RecordFragment.getInstance().stopRecording(false);
+                    RecordFragment.getInstance().setRecordPauseBtn();
                 }
                 break;
             case TelephonyManager.CALL_STATE_IDLE:

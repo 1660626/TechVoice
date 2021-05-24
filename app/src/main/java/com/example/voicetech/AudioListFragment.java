@@ -36,7 +36,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
     //    private MediaPlayer mediaPlayer = null;
     public File fileToPlay = null;
     boolean serviceBound = false;
-    boolean isStopBySystem = false;
     private MediaPlayerService player;
     private TextView player_header_title;
     private TextView player_filename;
@@ -298,7 +297,7 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
             @Override
             public void run() {
                 try {
-                    if (player != null && !isStopBySystem) {
+                    if (player != null) {
                         player_seekbar.setProgress(player.mediaPlayer.getCurrentPosition());
                         player_time.setText(Utils.formatMilliSecond(player.mediaPlayer.getCurrentPosition()));
                         seekbarHandler.postDelayed(this, 100);
@@ -310,12 +309,6 @@ public class AudioListFragment extends Fragment implements AudioListAdapter.onIt
                 }
             }
         };
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        isStopBySystem = true;
     }
 
     public void setPauseAudio() {

@@ -155,7 +155,6 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             mediaPlayer.seekTo(resumePosition);
             mediaPlayer.start();
             AudioListFragment.getInstance().resumeAudioUI();
-            AudioListFragment.getInstance().isStopBySystem = false;
         }
     }
 
